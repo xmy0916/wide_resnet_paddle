@@ -31,12 +31,20 @@ acc_fn = paddle.metric.accuracy
 accuracies=[]
 losses=[]
 model.eval()
+total = 0
+acc = 0
+
 for (x,y) in val_loader:
     with paddle.no_grad():
         logits=model(x)
         y=paddle.reshape(y,(-1,1))
         loss=loss_fn(logits,y)
-        acc=acc_fn(logits,y)
-        accuracies.append(np.mean(acc.numpy()))
-        losses.append(np.mean(loss.numpy()))
-print("acc:{} loss:{}".format(np.mean(accuracies)*100,np.mean(losses)))
+        logits = logits.numpy()
+        y = y.numpy()
+        total += len(logits)
+        for index,item in enumerate(logits):
+            label = np.argmax(item)
+            if label == y[index][0]:
+                acc += 1
+
+print("acc:{} total:{} ratio:{}".format(acc,total,acc*1.0/total))

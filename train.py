@@ -16,6 +16,7 @@ std = list(map(lambda x:x*255,std))
 
 train_loader = paddle.io.DataLoader(
     paddle.vision.datasets.Cifar10(mode='train', transform=transforms.Compose([
+        # transforms.Resize(size=64),
         transforms.RandomHorizontalFlip(),
         transforms.RandomCrop(32, 4),
         transforms.Transpose(order=(2,0,1)),
@@ -33,12 +34,15 @@ val_loader = paddle.io.DataLoader(
     num_workers=0, use_shared_memory=True)
 
 def training():
+    global save_every
     model.train()
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
     best_acc=0
     losses = []
     for epoch in range(epochs):
+        if epoch > 180:
+            save_every = 2
         # train for one epoch
         start = time.time()
         # model.train()
@@ -88,11 +92,11 @@ import warnings
 warnings.filterwarnings("ignore", category=Warning)
 model = WideResNet(28,10,20,0.3)
 
-epochs = 200
+epochs = 400
 save_every = 5
 loss_fn = paddle.nn.CrossEntropyLoss()
 acc_fn = paddle.metric.accuracy
-scheduler=paddle.optimizer.lr.PiecewiseDecay(boundaries=[60,120,160,200],values=[0.05,0.01,0.002,0.0004],verbose=True)
+scheduler=paddle.optimizer.lr.PiecewiseDecay(boundaries=[60,120,160,200,240,260,280],values=[0.05,0.01,0.002,0.0004,0.0002,0.0001,0.00005],verbose=True)
 opt = paddle.optimizer.Momentum(parameters=model.parameters(), learning_rate=scheduler, momentum=0.9,weight_decay=0.0005)
 save_dir = '/home/aistudio/models/cifar10/ResNet_wide'
 
