@@ -1,6 +1,6 @@
 # wide resnet
 
-acc:96.69
+acc:96.60
 
 # 训练
 ```bash
