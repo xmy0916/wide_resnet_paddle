@@ -1,9 +1,28 @@
+#encoding=utf8
+# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserved.
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import paddle
 from paddle.vision import transforms
 from wide_resnet import WideResNet
 import time
 import os
 import numpy as np
+import paddle.distributed as dist
+
+dist.get_world_size()
+dist.init_parallel_env()
 
 CUDA = True
 if CUDA:
@@ -91,6 +110,7 @@ import warnings
 
 warnings.filterwarnings("ignore", category=Warning)
 model = WideResNet(28,10,20,0.3)
+model = paddle.DataParallel(model)
 
 epochs = 400
 save_every = 5
